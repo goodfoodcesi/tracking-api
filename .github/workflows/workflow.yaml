@@ -100,7 +100,6 @@ jobs:
     environment: prod
     needs:
       - test
-      - build-dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
