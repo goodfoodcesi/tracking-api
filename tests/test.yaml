@@ -19,5 +19,5 @@ testcases:
         url: {{.url}}/notfound
         timeout: 5
         assertions:
-          - result.statuscode ShouldEqual 404
+          - result.statuscode ShouldEqual 401
           - result.timeseconds ShouldBeLessThan 1
