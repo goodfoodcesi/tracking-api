@@ -14,25 +14,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Download venom binary
-        run: |
-          curl https://github.com/ovh/venom/releases/download/v1.1.0/venom.linux-amd64 -o /usr/local/bin/venom 
-          chmod +x /usr/local/bin/venom
-          venom version
+        run: curl https://github.com/ovh/venom/releases/download/v1.1.0/venom.linux-amd64 -o /usr/local/bin/venom
+
+      - name: Make venom executable
+        run: chmod +x /usr/local/bin/venom
+
+      - name: Check venom version
+        run: venom version
       - name: Install go
         uses: actions/setup-go@v2
         with:
           go-version: 1.23.4
       - name: compile api
         run: CGO_ENABLED=0 GOOS=linux go build -ldflags "-w" -o ./trackingapi cmd/main.go
-      - name: Run tests
+      - name: Run api
         env:
           DBHost: "ip"
           Env: "dev"
         run: |
-          ./trackingapi & 
-          sleep 5
-          venom run tests/test.yaml
-
+          ./trackingapi &
+            sleep 5
+      - name: Run tests
+        run: venom run tests/test.yaml
   build-feature:
       if: github.event_name == 'workflow_dispatch'
       needs: test
