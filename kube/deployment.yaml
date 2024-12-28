@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracking-api
+  labels:
+    app: tracking-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tracking-api
+  template:
+    metadata:
+      labels:
+        app: tracking-api
+    spec:
+      containers:
+        - name: tracking-api
+          image: rg.fr-par.scw.cloud/goodfood/tracking-api:dev
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DBHost
+              value: "ip"
+            - name: Env
+              value: "dev"
