@@ -44,13 +44,14 @@ jobs:
           Env: "dev"
         run: |
           ./trackingapi &
-            sleep 5
+            sleep 2
       - name: Run tests
         run: |
           set -e
           venom run tests/test.yaml
   build-feature:
       if: github.event_name == 'workflow_dispatch'
+      environment: feature
       needs: test
       runs-on: ubuntu-latest
       steps:
@@ -69,7 +70,8 @@ jobs:
             push: true
             tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}:feature-${{ github.ref }}
   build-dev:
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/develop'
+    environment: dev
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -95,6 +97,7 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}:dev
   build-prod:
     if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'workflow_dispatch'
+    environment: prod
     needs:
       - test
       - build-dev
