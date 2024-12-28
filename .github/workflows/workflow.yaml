@@ -50,7 +50,7 @@ jobs:
           set -e
           venom run tests/test.yaml
   build-feature:
-      if: github.event_name == 'workflow_dispatch'
+      if: startsWith(github.ref, 'refs/heads/feature/')
       environment: feature
       needs: test
       runs-on: ubuntu-latest
