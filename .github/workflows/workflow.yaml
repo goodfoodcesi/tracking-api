@@ -14,10 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Download venom binary
-        run: curl https://github.com/ovh/venom/releases/download/v1.1.0/venom.linux-amd64 -o /usr/local/bin/venom
+        run: curl -L https://github.com/ovh/venom/releases/download/v1.1.0/venom.linux-amd64 -o /usr/local/bin/venom
 
-      - name: Make venom executable
-        run: chmod +x /usr/local/bin/venom
+      - name: Make venom executable and verify
+        run: |
+          chmod +x /usr/local/bin/venom
+          ls -l /usr/local/bin/venom
 
       - name: Check venom version
         run: venom version
@@ -35,7 +37,9 @@ jobs:
           ./trackingapi &
             sleep 5
       - name: Run tests
-        run: venom run tests/test.yaml
+        run: |
+          set -e
+          venom run tests/test.yaml
   build-feature:
       if: github.event_name == 'workflow_dispatch'
       needs: test
