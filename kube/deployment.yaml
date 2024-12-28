@@ -19,8 +19,5 @@ spec:
           image: rg.fr-par.scw.cloud/goodfood/tracking-api:dev
           ports:
             - containerPort: 8080
-          env:
-            - name: DBHost
-              value: "ip"
-            - name: Env
-              value: "dev"
+      imagePullSecrets:
+        - name: scaleway-registry-secret
