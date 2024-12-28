@@ -17,6 +17,7 @@ jobs:
         run: |
           curl https://github.com/ovh/venom/releases/download/v1.1.0/venom.linux-amd64 -o /usr/local/bin/venom 
           chmod +x /usr/local/bin/venom
+          venom --version
       - name: Install go
         uses: actions/setup-go@v2
         with:
@@ -30,7 +31,7 @@ jobs:
         run: |
           ./trackingapi & 
           sleep 5
-          ./venom run tests/test.yaml
+          venom run tests/test.yaml
 
   build-feature:
       if: github.event_name == 'workflow_dispatch'
