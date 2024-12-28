@@ -18,7 +18,7 @@ func main() {
 		tracer.Start(
 			tracer.WithService("tracking-api"),
 			tracer.WithEnv(loadConfig.Env),
-			tracer.WithServiceVersion("0.0.3"),
+			tracer.WithServiceVersion("0.0.4"),
 		)
 		defer tracer.Stop()
 		gin.DefaultWriter = io.Discard
