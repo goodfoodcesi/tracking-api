@@ -21,3 +21,4 @@ testcases:
         assertions:
           - result.statuscode ShouldEqual 404
           - result.timeseconds ShouldBeLessThan 1
+          - result.body ShouldEqual "404 page not found"
