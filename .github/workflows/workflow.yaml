@@ -96,7 +96,7 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}:dev
   build-prod:
-    if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/')
     environment: prod
     needs:
       - test
