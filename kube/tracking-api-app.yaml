@@ -4,10 +4,12 @@ metadata:
   name: tracking-api
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: rg.fr-par.scw.cloud/goodfood/tracking-api
+    argocd-image-updater.argoproj.io/image-list: rg.fr-par.scw.cloud/goodfood/tracking-api:dev
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
     argocd-image-updater.argoproj.io/tracking-api.force-update: "true"
-    argocd-image-updater.argoproj.io/tracking-api.allow-tags: dev
+    argocd-image-updater.argoproj.io/tracking-api.allow-tags: "regexp:^dev$"
+    argocd-image-updater.argoproj.io/tracking-api.pull-secret: scw-registry-secret
+    argocd-image-updater.argoproj.io/tracking-api.tag-match: regexp:^dev$
 spec:
   project: default
   source:
