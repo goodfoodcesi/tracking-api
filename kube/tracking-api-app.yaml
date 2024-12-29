@@ -8,7 +8,7 @@ metadata:
     argocd-image-updater.argoproj.io/tracking-api.pull-secret: pullsecret:argocd/scw-registry-secret
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
   finalizers:
-    - resources-finalizer.argocd.argoproj.io # Ajout de cette ligne pour permettre la suppression de l'application
+    - resources-finalizer.argocd.argoproj.io # Ajout de cette ligne pour permettre la suppression de l'application via ArgoCD
 spec:
   project: default
   source:
