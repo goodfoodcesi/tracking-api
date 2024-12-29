@@ -3,7 +3,14 @@ kind: Deployment
 metadata:
   name: tracking-api
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracking-api
   template:
+    metadata:
+      labels:
+        app: tracking-api
     spec:
       imagePullSecrets:
         - name: scw-registry-secret
@@ -18,10 +25,4 @@ spec:
             - name: APIPort
               value: ":8080"
             - name: DBHost
-              value: ip
-  selector:
-    matchLabels:
-      app: tracking-api
-  replicas: 1
-  strategy:
-      type: RollingUpdate
+              value: "db-service" # Mettez l'adresse correcte ici
