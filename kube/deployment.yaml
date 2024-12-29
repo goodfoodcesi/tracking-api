@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracking-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracking-api
+  template:
+    metadata:
+      labels:
+        app: tracking-api
+    spec:
+      imagePullSecrets:
+        - name: scw-registry-secret
+      containers:
+        - name: tracking-api
+          image: rg.fr-par.scw.cloud/goodfood/tracking-api:dev
+          ports:
+            - containerPort: 8080
+          env:
+            - name: Env
+              value: dev
+            - name: APIPort
+              value: ":8080"
+            - name: DBHost
+              value: "db-service" # Mettez l'adresse correcte ici
