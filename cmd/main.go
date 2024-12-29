@@ -18,7 +18,7 @@ func main() {
 		tracer.Start(
 			tracer.WithService("tracking-api"),
 			tracer.WithEnv(loadConfig.Env),
-			tracer.WithServiceVersion("0.0.4"),
+			tracer.WithServiceVersion("0.0.5"),
 		)
 		defer tracer.Stop()
 		gin.DefaultWriter = io.Discard
@@ -32,7 +32,7 @@ func main() {
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong3",
+			"message": "pong4",
 		})
 	})
 
