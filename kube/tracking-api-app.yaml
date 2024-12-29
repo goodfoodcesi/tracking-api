@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: tracking-api=rg.fr-par.scw.cloud/goodfood/tracking-api:dev
     argocd-image-updater.argoproj.io/tracking-api.pull-secret: pullsecret:argocd/scw-registry-secret
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # Ajout de cette ligne pour permettre la suppression de l'application
 spec:
   project: default
   source:
@@ -21,3 +23,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - PrunePropagationPolicy=Foreground
+      - PruneLast=true
+      - Replace=true

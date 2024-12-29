@@ -99,7 +99,3 @@ func SetupLogging(r *gin.Engine, env string) *zap.Logger {
 
 	return logger
 }
-
-func GetRequestLogger(c *gin.Context) *zap.Logger {
-	return c.MustGet("logger").(*zap.Logger)
-}
