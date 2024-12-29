@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/image-list: tracking-api=rg.fr-par.scw.cloud/goodfood/tracking-api:dev
     argocd-image-updater.argoproj.io/write-back-method: git
-    argocd-image-updater.argoproj.io/tracking-api.pull-secret: scw-registry-secret
+    argocd-image-updater.argoproj.io/tracking-api.pull-secret: pullsecret:argocd/scw-registry-secret
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: latest
 spec:
   project: default
