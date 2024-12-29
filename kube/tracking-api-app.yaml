@@ -5,13 +5,12 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: tracking-api=rg.fr-par.scw.cloud/goodfood/tracking-api:dev
-    argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/tracking-api.pull-secret: pullsecret:argocd/scw-registry-secret
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
 spec:
   project: default
   source:
-    repoURL: https://github.com/goodfoodcesi/tracking-api.git
+    repoURL: https://github.com/goodfoodcesi/tracking-api
     targetRevision: HEAD
     path: kube
     kustomize: {}  # Ajout de cette ligne pour spécifier l'utilisation de Kustomize
