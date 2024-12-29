@@ -3,6 +3,11 @@ kind: Application
 metadata:
   name: tracking-api
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: tracking-api=rg.fr-par.scw.cloud/goodfood/tracking-api
+    argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
+    argocd-image-updater.argoproj.io/tracking-api.force-update: "true"
+    argocd-image-updater.argoproj.io/tracking-api.allow-tags: dev
 spec:
   project: default
   source:
@@ -11,10 +16,9 @@ spec:
     path: kube
   destination:
     server: https://kubernetes.default.svc
-    namespace: tracking-api
+    namespace: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+
