@@ -1,6 +1,6 @@
 name: Test
 vars:
-  url: "http://127.0.0.1:8080"
+  url: "http://127.0.0.1:8080/tracking-api"
 testcases:
   - name: ping
     steps:
@@ -21,4 +21,5 @@ testcases:
         assertions:
           - result.statuscode ShouldEqual 404
           - result.timeseconds ShouldBeLessThan 1
-          - result.body ShouldEqual "404 page not found"
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson.message ShouldEqual Not found
