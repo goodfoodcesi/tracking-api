@@ -9,10 +9,14 @@ spec:
     matchLabels:
       app: tracking-api
   template:
+
     metadata:
+      annotations:
+        ad.datadoghq.com/tracking-api.logs: '[{"source": "kubernetes", "service": "tracking-api", "env": "dev"}]'
       labels:
         app: tracking-api
     spec:
+
       imagePullSecrets:
         - name: scw-registry-secret
       containers:
