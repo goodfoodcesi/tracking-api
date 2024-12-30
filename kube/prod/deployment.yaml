@@ -17,12 +17,12 @@ spec:
         - name: scw-registry-secret
       containers:
         - name: tracking-api
-          image: rg.fr-par.scw.cloud/goodfood/tracking-api:dev
+          image: rg.fr-par.scw.cloud/goodfood/tracking-api:latest
           ports:
             - containerPort: 8080
           env:
             - name: Env
-              value: dev
+              value: prod
             - name: APIPort
               value: ":8080"
             - name: DBHost

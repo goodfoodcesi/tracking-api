@@ -8,7 +8,7 @@ metadata:
 
 spec:
   rules:
-    - host: api.theotruvelot.fr
+    - host: dev.api.goodfood.ovh
       http:
         paths:
           - path: /tracking-api

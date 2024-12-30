@@ -7,14 +7,12 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: tracking-api=rg.fr-par.scw.cloud/goodfood/tracking-api:dev
     argocd-image-updater.argoproj.io/tracking-api.pull-secret: pullsecret:argocd/scw-registry-secret
     argocd-image-updater.argoproj.io/tracking-api.update-strategy: digest
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io # Ajout de cette ligne pour permettre la suppression de l'application via ArgoCD
 spec:
   project: default
   source:
     repoURL: https://github.com/goodfoodcesi/tracking-api
     targetRevision: HEAD
-    path: kube
+    path: kube/dev
     kustomize: {}  # Ajout de cette ligne pour spécifier l'utilisation de Kustomize
   destination:
     server: https://kubernetes.default.svc
