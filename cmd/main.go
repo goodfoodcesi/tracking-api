@@ -26,11 +26,15 @@ func main() {
 
 	r := gin.New()
 	r.Use(gintrace.Middleware("tracking-api"))
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
+	})
+	api := r.Group("/tracking-api")
 
 	logger := logging.SetupLogging(r, loadConfig.Env)
 	defer logger.Sync()
 
-	r.GET("/ping", func(c *gin.Context) {
+	api.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
