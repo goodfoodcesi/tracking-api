@@ -56,16 +56,11 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
-func SetupLogging(r *gin.Engine, env string) *zap.Logger {
+func SetupLogging(r *gin.RouterGroup, env string) *zap.Logger {
 	var logger *zap.Logger
 
-	if env == "dev" {
-		gin.SetMode(gin.DebugMode)
-		logger = zap.Must(zap.NewDevelopment())
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-		logger = zap.Must(zap.NewProduction())
-	}
+	gin.SetMode(gin.ReleaseMode)
+	logger = zap.Must(zap.NewProduction())
 
 	r.Use(func(c *gin.Context) {
 		c.Set("logger", logger)

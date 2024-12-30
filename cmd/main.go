@@ -31,7 +31,7 @@ func main() {
 	})
 	api := r.Group("/tracking-api")
 
-	logger := logging.SetupLogging(r, loadConfig.Env)
+	logger := logging.SetupLogging(api, loadConfig.Env)
 	defer logger.Sync()
 
 	api.GET("/ping", func(c *gin.Context) {
