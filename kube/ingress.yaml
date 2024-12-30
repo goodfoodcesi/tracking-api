@@ -10,7 +10,7 @@ metadata:
 
 spec:
   rules:
-    - host: theotruvelot.fr
+    - host: api.theotruvelot.fr
       http:
         paths:
           - path: /tracking-api
