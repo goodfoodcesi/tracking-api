@@ -6,7 +6,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-w" -o /trackingapi cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-w" -o /trackingapi cmd/api/main.go
 
 
 FROM scratch AS build-release-stage

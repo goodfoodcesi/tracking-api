@@ -7,3 +7,22 @@ services:
       - Env=dev
       - APIPort=:8080
       - DBHost=ip
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    links:
+      - redis-commander
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    ports:
+      - 8081:8081
+    environment:
+        - REDIS_HOSTS=redis
+        - REDIS_PORT=6379
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
