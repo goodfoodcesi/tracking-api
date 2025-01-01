@@ -4,7 +4,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - Env=dev
+      - Env=prod
       - APIPort=:8080
       - DBHost=ip
   redis:

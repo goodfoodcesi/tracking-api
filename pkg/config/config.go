@@ -26,7 +26,7 @@ func LoadConfig() Config {
 
 	// Vérification des variables d'environnement obligatoires
 	requiredEnvVars := map[string]string{
-		"DBHost": config.DBHost,
+		//"DBHost": config.DBHost,
 	}
 
 	for varName, varValue := range requiredEnvVars {

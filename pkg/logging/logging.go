@@ -56,7 +56,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
-func SetupLogging(r *gin.RouterGroup, env string) *zap.Logger {
+func SetupLogging(r *gin.Engine, env string) *zap.Logger {
 	var logger *zap.Logger
 
 	gin.SetMode(gin.ReleaseMode)
@@ -91,6 +91,7 @@ func SetupLogging(r *gin.RouterGroup, env string) *zap.Logger {
 	}))
 
 	r.Use(ginzap.RecoveryWithZap(logger, true))
+	logger.Info("Logging initialized", zap.String("env", env))
 
 	return logger
 }

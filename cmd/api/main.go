@@ -1,46 +1,42 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	_ "github.com/goodfoodcesi/tracking-api/docs"
+	"github.com/goodfoodcesi/tracking-api/pkg/api"
 	"github.com/goodfoodcesi/tracking-api/pkg/config"
-	"github.com/goodfoodcesi/tracking-api/pkg/logging"
-	"go.uber.org/zap"
-	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	"io"
-	"net/http"
 )
 
+// @title         Tracking API
+// @version       1.0
+// @description   Testing Swagger APIs.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name   Apache 2.0
+// @license.url    http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /tracking-api
+// @schemes   http https
 func main() {
 	loadConfig := config.LoadConfig()
 
-	if loadConfig.Env != "dev" {
-		tracer.Start(
-			tracer.WithService("tracking-api"),
-			tracer.WithEnv(loadConfig.Env),
-			tracer.WithServiceVersion("0.0.5"),
-		)
-		defer tracer.Stop()
-		gin.DefaultWriter = io.Discard
-	}
+	//if loadConfig.Env != "dev" {
+	//	tracer.Start(
+	//		tracer.WithService("tracking-api"),
+	//		tracer.WithEnv(loadConfig.Env),
+	//		tracer.WithServiceVersion("0.0.5"),
+	//	)
+	//	defer tracer.Stop()
+	//	gin.DefaultWriter = io.Discard
+	//}
 
-	r := gin.New()
-	r.Use(gintrace.Middleware("tracking-api"))
-	r.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
-	})
-	api := r.Group("/tracking-api")
-
-	logger := logging.SetupLogging(api, loadConfig.Env)
-	defer logger.Sync()
-
-	api.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	r := api.SetupApi(loadConfig)
 
 	if err := r.Run(); err != nil {
-		logger.Fatal("Cannot run API", zap.Error(err))
+		panic(err)
 	}
 }
