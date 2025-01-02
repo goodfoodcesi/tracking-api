@@ -1,12 +1,13 @@
 package logging
 
 import (
+	"math/rand"
+	"time"
+
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	"math/rand"
-	"time"
 )
 
 const (
@@ -31,13 +32,9 @@ func RequestIDMiddleware() gin.HandlerFunc {
 		c.Set(RequestIDKey, requestID)
 		c.Header("X-Request-ID", requestID)
 
-		// Récupérer le logger de base
 		logger := c.MustGet("logger").(*zap.Logger)
 
-		// Récupérer le span du context
-		span, exists := tracer.SpanFromContext(c.Request.Context())
-		if exists {
-			// Ajouter trace_id et span_id au logger
+		if span, exists := tracer.SpanFromContext(c.Request.Context()); exists {
 			traceID := span.Context().TraceID()
 			spanID := span.Context().SpanID()
 
@@ -46,9 +43,17 @@ func RequestIDMiddleware() gin.HandlerFunc {
 				zap.Uint64("dd.trace_id", traceID),
 				zap.Uint64("dd.span_id", spanID),
 			)
+
+			// Ajouter le logger au context
+			ctx := WithContext(c.Request.Context(), requestLogger)
+			c.Request = c.Request.WithContext(ctx)
 			c.Set("logger", requestLogger)
 		} else {
 			requestLogger := logger.With(zap.String("request_id", requestID))
+
+			// Ajouter le logger au context
+			ctx := WithContext(c.Request.Context(), requestLogger)
+			c.Request = c.Request.WithContext(ctx)
 			c.Set("logger", requestLogger)
 		}
 
@@ -56,7 +61,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
-func SetupLogging(r *gin.Engine, env string) *zap.Logger {
+func SetupHttpLogging(r *gin.Engine, env string) *zap.Logger {
 	var logger *zap.Logger
 
 	gin.SetMode(gin.ReleaseMode)

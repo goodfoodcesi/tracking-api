@@ -1,19 +1,20 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/goodfoodcesi/tracking-api/pkg/config"
 	"github.com/goodfoodcesi/tracking-api/pkg/logging"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
-	"net/http"
 )
 
 func SetupApi(loadConfig config.Config) *gin.Engine {
 	r := gin.New()
 	r.Use(gintrace.Middleware("tracking-api"))
-	logging.SetupLogging(r, loadConfig.Env)
+	logging.SetupHttpLogging(r, loadConfig.Env)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})

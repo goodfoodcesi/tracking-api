@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "github.com/goodfoodcesi/tracking-api/pkg/tracking";
+
+package tracking;
+
+service LocationService {
+  rpc SendLocation(Location) returns (LocationResponse) {}
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+  string order_id = 3;
+  string driver_id = 4;
+  int64 timestamp = 5;
+}
+
+message LocationResponse {
+  bool success = 1;
+  string message = 2;
+}
