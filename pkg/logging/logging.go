@@ -1,20 +1,48 @@
 package logging
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 const (
-	RequestIDKey = "RequestID"
+	RequestIDKey = "request-id"
 	charset      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	idLength     = 6
 )
+
+type LogManager struct {
+	logger *zap.Logger
+	env    string
+}
+
+func NewLogManager(env string) *LogManager {
+	logger := InitLogger(env)
+	return &LogManager{
+		logger: logger,
+		env:    env,
+	}
+}
+
+func (lm *LogManager) addTraceInfo(ctx context.Context, fields []zap.Field) []zap.Field {
+	if span, exists := tracer.SpanFromContext(ctx); exists {
+		traceID := span.Context().TraceID()
+		spanID := span.Context().SpanID()
+		return append(fields,
+			zap.Uint64("dd.trace_id", traceID),
+			zap.Uint64("dd.span_id", spanID),
+		)
+	}
+	return fields
+}
 
 func generateRequestID() string {
 	b := make([]byte, idLength)
@@ -24,79 +52,98 @@ func generateRequestID() string {
 	return string(b)
 }
 
-func RequestIDMiddleware() gin.HandlerFunc {
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	return func(c *gin.Context) {
+func (lm *LogManager) GrpcInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
 		requestID := generateRequestID()
-		c.Set(RequestIDKey, requestID)
-		c.Header("X-Request-ID", requestID)
 
-		logger := c.MustGet("logger").(*zap.Logger)
-
-		if span, exists := tracer.SpanFromContext(c.Request.Context()); exists {
-			traceID := span.Context().TraceID()
-			spanID := span.Context().SpanID()
-
-			requestLogger := logger.With(
-				zap.String("request_id", requestID),
-				zap.Uint64("dd.trace_id", traceID),
-				zap.Uint64("dd.span_id", spanID),
-			)
-
-			// Ajouter le logger au context
-			ctx := WithContext(c.Request.Context(), requestLogger)
-			c.Request = c.Request.WithContext(ctx)
-			c.Set("logger", requestLogger)
-		} else {
-			requestLogger := logger.With(zap.String("request_id", requestID))
-
-			// Ajouter le logger au context
-			ctx := WithContext(c.Request.Context(), requestLogger)
-			c.Request = c.Request.WithContext(ctx)
-			c.Set("logger", requestLogger)
+		fields := []zap.Field{
+			zap.String("request_id", requestID),
+			zap.String("method", info.FullMethod),
 		}
 
-		c.Next()
+		fields = lm.addTraceInfo(ctx, fields)
+		requestLogger := lm.logger.With(fields...)
+
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			md = metadata.MD{}
+		}
+
+		newMD := metadata.Join(md, metadata.Pairs(RequestIDKey, requestID))
+		ctx = metadata.NewIncomingContext(ctx, newMD)
+		ctx = WithContext(ctx, requestLogger)
+
+		requestLogger.Info("Processing gRPC request")
+		resp, err := handler(ctx, req)
+
+		requestLogger.Info("Completed gRPC request",
+			zap.Duration("duration", time.Since(start)),
+			zap.Error(err))
+
+		return resp, err
 	}
 }
 
-func SetupHttpLogging(r *gin.Engine, env string) *zap.Logger {
-	var logger *zap.Logger
-
-	gin.SetMode(gin.ReleaseMode)
-	logger = zap.Must(zap.NewProduction())
-
+func (lm *LogManager) SetupHttp(r *gin.Engine) {
 	r.Use(func(c *gin.Context) {
-		c.Set("logger", logger)
+		c.Set("logger", lm.logger)
 		c.Next()
 	})
 
-	r.Use(RequestIDMiddleware())
+	r.Use(lm.httpRequestIDMiddleware())
 
-	r.Use(ginzap.GinzapWithConfig(logger, &ginzap.Config{
+	r.Use(ginzap.GinzapWithConfig(lm.logger, &ginzap.Config{
 		UTC:        true,
 		TimeFormat: time.RFC3339,
 		Context: func(c *gin.Context) []zap.Field {
 			fields := []zap.Field{
 				zap.String("request_id", c.GetString(RequestIDKey)),
 			}
-
-			if span, exists := tracer.SpanFromContext(c.Request.Context()); exists {
-				traceID := span.Context().TraceID()
-				spanID := span.Context().SpanID()
-				fields = append(fields,
-					zap.Uint64("dd.trace_id", traceID),
-					zap.Uint64("dd.span_id", spanID),
-				)
-			}
-
-			return fields
+			return lm.addTraceInfo(c.Request.Context(), fields)
 		},
 	}))
 
-	r.Use(ginzap.RecoveryWithZap(logger, true))
-	logger.Info("Logging initialized", zap.String("env", env))
+	r.Use(ginzap.RecoveryWithZap(lm.logger, true))
+	lm.logger.Info("HTTP logging initialized", zap.String("env", lm.env))
+}
 
-	return logger
+func (lm *LogManager) SetupGrpcLogging() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		requestID := generateRequestID()
+		fields := []zap.Field{
+			zap.String("request_id", requestID),
+			zap.String("method", info.FullMethod),
+		}
+		fields = lm.addTraceInfo(ctx, fields)
+		requestLogger := lm.logger.With(fields...)
+
+		requestLogger.Info("Processing gRPC request")
+		resp, err := handler(ctx, req)
+
+		requestLogger.Info("Completed gRPC request",
+			zap.Duration("duration", time.Since(start)),
+			zap.Error(err))
+
+		return resp, err
+	}
+}
+
+func (lm *LogManager) httpRequestIDMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestID := generateRequestID()
+		c.Set(RequestIDKey, requestID)
+		c.Header("X-Request-ID", requestID)
+
+		fields := []zap.Field{zap.String("request_id", requestID)}
+		fields = lm.addTraceInfo(c.Request.Context(), fields)
+
+		requestLogger := lm.logger.With(fields...)
+		ctx := WithContext(c.Request.Context(), requestLogger)
+		c.Request = c.Request.WithContext(ctx)
+		c.Set("logger", requestLogger)
+
+		c.Next()
+	}
 }

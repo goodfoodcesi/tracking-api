@@ -2,17 +2,21 @@ package server
 
 import (
 	"net/http"
+	"strings"
 
-	"github.com/gin-gonic/gin"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 )
 
-func NewMultiplexHandler(ginHandler *gin.Engine, grpcServer *grpc.Server) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor == 2 && r.Header.Get("content-type") == "application/grpc" {
+func NewMultiplexHandler(httpHandler http.Handler, grpcServer *grpc.Server) http.Handler {
+	h2Handler := h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
 			grpcServer.ServeHTTP(w, r)
-			return
+		} else {
+			httpHandler.ServeHTTP(w, r)
 		}
-		ginHandler.ServeHTTP(w, r)
-	})
+	}), &http2.Server{})
+
+	return h2Handler
 }

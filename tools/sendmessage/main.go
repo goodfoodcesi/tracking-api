@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/goodfoodcesi/api-utils-go/pkg/message"
 	"github.com/goodfoodcesi/api-utils-go/pkg/order"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -14,8 +15,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer pub.Close()
 
-	newOrder := order.NewOrder("order-1", "customer-1", "shop-1", "delivery-1")
+	newOrder := order.NewOrder("order-1", "customer-1", "shop-1", "driver-1")
 	orderMessage := message.NewMessage(order.OrderCreated, "tools", newOrder)
 
 	err = pub.PublishMessage("orders", orderMessage)
@@ -25,6 +27,7 @@ func main() {
 }
 
 type Publisher struct {
+	conn    *amqp.Connection
 	channel *amqp.Channel
 }
 
@@ -36,10 +39,23 @@ func NewPublisher(amqpURL string) (*Publisher, error) {
 
 	ch, err := conn.Channel()
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	return &Publisher{channel: ch}, nil
+	return &Publisher{
+		conn:    conn,
+		channel: ch,
+	}, nil
+}
+
+func (p *Publisher) Close() {
+	if p.channel != nil {
+		p.channel.Close()
+	}
+	if p.conn != nil {
+		p.conn.Close()
+	}
 }
 
 func (p *Publisher) PublishMessage(queueName string, message any) error {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/goodfoodcesi/api-utils-go/pkg/message"
 	"github.com/goodfoodcesi/api-utils-go/pkg/order"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -143,6 +144,21 @@ func main() {
 		}
 
 		fmt.Printf("Order received: %+v\n", orderPayload)
+		orderJson, err := orderPayload.MarshalOrderJSON()
+		if err != nil {
+			return fmt.Errorf("failed to marshal order: %w", err)
+		}
+		err = rdb.Set(ctx, orderPayload.OrderID, orderJson, 0).Err()
+		if err != nil {
+			return fmt.Errorf("failed to write to redis: %w", err)
+		}
+
+		order, err := rdb.Get(ctx, orderPayload.OrderID).Result()
+		if err != nil {
+			return fmt.Errorf("failed to get order: %w", err)
+		}
+		fmt.Printf("Order from redis: %+v\n", order)
+
 		return nil
 	})
 	if err != nil {

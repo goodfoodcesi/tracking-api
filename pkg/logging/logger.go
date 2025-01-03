@@ -67,9 +67,8 @@ func (l *zapLogger) Warn(msg string, fields ...any) {
 }
 
 func InitLogger(env string) *zap.Logger {
-	var config zap.Config
 
-	config = zap.NewProductionConfig()
+	config := zap.NewProductionConfig()
 
 	logger, err := config.Build()
 	if err != nil {

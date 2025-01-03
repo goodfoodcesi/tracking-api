@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
-	github.com/goodfoodcesi/api-utils-go v0.0.5
+	github.com/goodfoodcesi/api-utils-go v0.0.7
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/swaggo/files v1.0.1
@@ -13,6 +13,8 @@ require (
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.33.0
+	google.golang.org/grpc v1.64.0
+	google.golang.org/protobuf v1.36.1
 	gopkg.in/DataDog/dd-trace-go.v1 v1.70.1
 )
 
@@ -55,9 +57,9 @@ require (
 	github.com/go-playground/validator/v10 v10.23.0 // indirect
 	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/go-secure-stdlib/parseutil v0.1.7 // indirect
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.2 // indirect
@@ -105,8 +107,6 @@ require (
 	golang.org/x/tools v0.28.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240520151616-dc85e6b867a5 // indirect
-	google.golang.org/grpc v1.64.0 // indirect
-	google.golang.org/protobuf v1.36.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -12,6 +12,7 @@ type Config struct {
 	DBPort     string `env:"DBPort"`
 	DBPassword string `env:"DBPassword"`
 	Env        string `env:"Env"`
+	APISecret  string `env:"APISecret"`
 }
 
 func LoadConfig() Config {
@@ -22,11 +23,13 @@ func LoadConfig() Config {
 		DBPort:     os.Getenv("DBPort"),
 		DBPassword: os.Getenv("DBPassword"),
 		Env:        os.Getenv("Env"),
+		APISecret:  os.Getenv("APISecret"),
 	}
 
 	// Vérification des variables d'environnement obligatoires
 	requiredEnvVars := map[string]string{
 		//"DBHost": config.DBHost,
+		"APISecret": config.APISecret,
 	}
 
 	for varName, varValue := range requiredEnvVars {
