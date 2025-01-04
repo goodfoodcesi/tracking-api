@@ -42,6 +42,7 @@ jobs:
         env:
           DBHost: "ip"
           Env: "dev"
+          APISecret: "secret"
         run: |
           ./trackingapi &
             sleep 2
