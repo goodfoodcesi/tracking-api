@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/goodfoodcesi/tracking-api/pkg/config"
 	"github.com/goodfoodcesi/tracking-api/pkg/token"
 	"google.golang.org/grpc"

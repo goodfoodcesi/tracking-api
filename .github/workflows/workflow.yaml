@@ -48,7 +48,7 @@ jobs:
       - name: Run tests
         run: |
           set -e
-          venom run tests/test.yaml
+          venom run tests/test.yaml --var url=http://localhost:8080/tracking
   build-feature:
       if: startsWith(github.ref, 'refs/heads/feature/')
       environment: feature

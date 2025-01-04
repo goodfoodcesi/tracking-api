@@ -26,8 +26,8 @@ func SetupApi(cfg config.Config, logManager *logging.LogManager) *gin.Engine {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
 	})
 
-	api := r.Group("/tracking-api")
-	api.Use(JWTInterceptor(cfg))
+	api := r.Group("/tracking")
+	//api.Use(JWTInterceptor(cfg))
 	SetupRoutes(api)
 
 	return r

@@ -1,0 +1,22 @@
+services:
+  redis:
+    image: redis
+    expose:
+      - "6379"
+    links:
+      - redis-commander
+
+
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    expose:
+      - "8081"
+    environment:
+      - REDIS_HOSTS=redis
+      - REDIS_PORT=6379
+
+networks:
+    default:
+      external: true
+      name: goodfood-api

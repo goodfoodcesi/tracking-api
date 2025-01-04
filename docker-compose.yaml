@@ -1,29 +1,21 @@
 services:
   trackingapi:
     build: .
-    ports:
-      - 8080:8080
+    expose:
+      - "8080"
     environment:
       - Env=dev
       - APIPort=:8080
       - DBHost=ip
       - APISecret=your-super-secret-jwt-token-with-at-least-32-characters-long
-  redis:
-    image: redis
-    ports:
-      - 6379:6379
-    links:
-      - redis-commander
-  redis-commander:
-    container_name: redis-commander
-    image: rediscommander/redis-commander
-    ports:
-      - 8081:8081
-    environment:
-        - REDIS_HOSTS=redis
-        - REDIS_PORT=6379
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - 5672:5672
-      - 15672:15672
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tracking.rule=Host(`api.goodfood.dev`) && PathPrefix(`/tracking`)"
+      - "traefik.http.routers.tracking.entrypoints=web"
+      - "traefik.http.services.tracking.loadbalancer.server.port=8080"
+      - "traefik.docker.network=shared-rabbitmq-network"
+
+networks:
+  default:
+    external: true
+    name: goodfood-api

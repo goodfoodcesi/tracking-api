@@ -1,6 +1,4 @@
 name: Test
-vars:
-  url: "http://127.0.0.1:8080/tracking-api"
 testcases:
   - name: ping
     steps:
